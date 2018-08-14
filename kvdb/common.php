@@ -29,6 +29,9 @@ if( array_key_exists('HTTP_KV_AUTH_TOKEN',$_SERVER) ) {
 
 //  //  //  //  //  //  //  //  //  //
 
+// NOTE: this is HORRIBLY INSECURE and susceptible to CSRF attacks!
+// TODO: need to move params out to form (_POST instead of _REQUEST)
+
 // prepare the inputs
 // NOTE: we'll clean up the inputs later, before we send them into SQL query statements
 $op = 'help';
