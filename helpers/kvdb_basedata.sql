@@ -1,0 +1,10 @@
+insert into TokenDB values ('abc123def456','oona','readwrite');
+insert into TokenDB values ('abc123ghi789','oona','readonly');
+insert into TokenDB values ('a1b2c3d4e5f6','oona','admin');
+insert into TokenDB values ('xabc123def456','baba','readwrite');
+insert into TokenDB values ('xabc123ghi789','baba','readonly');
+insert into TokenDB values ('xa1b2c3d4e5f6','baba','admin');
+insert into TokenDB values ('123456789','guest','readonly');
+insert into TokenDB values ('987654321','guest','readwrite');
+insert into TokenDB values ('abcdefghijkl','guest','admin');
+insert into TokenDB values ('xyzxyzxyzxyz','mossy','superadmin');
