@@ -1,0 +1,88 @@
+API INFO
+========
+
+The basic idea is a Tuple-Space key-value store.  So simple 
+get and set operations will work, but there is also an atomic
+get-and-delete, called a "take" operation, and an atomic 
+get-and-rename, called a "move" operation.
+
+Wildcards are supported for get, take, and move operations.
+So, with a suitable key-naming scheme, a client can "get" a task
+for processing without having to know which exact task to "get".
+E.g. "Get TASK*" could return "TASK001", "TASK023", or "TASK099".
+
+To simplify interaction with things like AppInventor/Thunkable
+everything works with HTTP-GET and HTTP-POST, and the original
+operation and keys are also returned.
+
+Basic options:
+	o = operation to execute
+	k = key to operate on
+	k2 = second key (for move operation)
+	v = value to set key to
+	s = starting point (for list operation)
+	n = number of items to list
+
+Input is expected to be JSON, but simple strings will be
+converted to a simple JSON-string (enclosed in quotes)
+
+Output is a JSON hash/dictionary:
+	status = "ok" or "error"
+	statusCode = HTTP status code
+	info = (if present) additional error info
+
+Endpoint:  /path/to/kvdb.php?options
+	o=help 
+		returns a JSON list of commands
+	o=get&k=abc
+		get value for key=abc
+	o=get&k=abc% 
+		get value for key starting with abc (wildcard)
+		Note: wilcard must be at the end of the key
+	o=set&k=abc&v=def
+		set data for key=abc to value=def
+	o=add&k=abc&v=def 
+		add data for key=abc val=def only if it key does not exist
+		if key exists, an 'info' message will be returned
+	o=rep&k=abc&v=def
+		replace data for key=abc with val=def only if key already exists
+		if key does not exist, an 'info' message will be returned
+	o=del&k=abc
+		delete the data for key=abc
+	o=take&k=abc
+		atomic get-and-delete key=abc
+	o=take&k=abc%
+		atomic get-and-delete of one key=abc% (wildcard); will
+		return the original key (with wildcard) and the found-key
+	o=move&k=abc&k2=def
+		atomic get-and-rename key1=abc to key2=def
+	o=move&k=abc%&k2=def
+		atomic get-and-rename of one key1=abc% to key2 (wildcard);
+		will return the original key (with wildcard) and the found-key
+	o=move&k=abc%&k2=def%
+		atomic get-and-rename of one key1=abc% to key2=def% (where
+		both have wildcards);  will return the original keys (with 
+		wildcards) and the found-/renamed-keys; in this example, a
+		key like "abc123" will be renamed to "def123"
+	o=list
+		list (default) 10 keys starting from (default) 0
+	o=list&k=abc%
+		list (default) 10 keys matching abc* (wildcard) starting from (default) 0
+	o=list&n=20
+		list 20 keys starting from (default) 0
+	o=list&s=123
+		list (default) 10 keys starting from 123rd key
+	o=list&s=123&n=20
+		list 20 keys starting from 123rd key
+	o=list&k=abc%&s=123&n=20
+		list 20 keys matching abc* (wildcard) starting from 123rd key
+
+The list operations are based on the ordering of the underlying 
+SQL layer.  
+
+TODOs:
+* Since everything is HTTP-GET-able, it is vulnerable to CSRF;
+  should move relevant params to POST-only
+* List ops probably need a cursor
+* Clean-up error codes to better match std REST expectations
+* Clean-up info messages; add them where needed
